@@ -88,7 +88,7 @@ The API will be available at http://localhost:8000.
 The backend expects a database URL to be set in the environment. If you are using SQLite for local development, create a .env file with a value such as:
 
 ```env
-DATABASE_URL=sqlite:///./investigations.db
+DATABASE_URL=sqlite:///./investigations.db use postgreSql if not
 ```
 
 The application can then use the database file created at runtime.
