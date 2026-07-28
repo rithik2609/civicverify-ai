@@ -1,65 +1,159 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+  Search,
+  ShieldCheck,
+  FileText,
+  ImageIcon,
+  Link2,
+} from "lucide-react";
+
+import { verifyClaim } from "@/lib/api";
 
 export default function Home() {
+  const [claim, setClaim] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const router = useRouter();
+
+  const handleInvestigation = async () => {
+    if (!claim.trim()) {
+      alert("Please enter a claim");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const result = await verifyClaim(claim);
+
+      localStorage.setItem(
+        "investigation",
+        JSON.stringify(result)
+      );
+
+      router.push("/investigation/1");
+    } catch (error) {
+      console.error(error);
+      alert("Investigation failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <main className="min-h-screen bg-white">
+      {/* Hero */}
+      <section className="px-6 py-24">
+        <div className="max-w-5xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border mb-6">
+            <ShieldCheck size={16} />
+            <span>AI-Powered Public Verification</span>
+          </div>
+
+          <h1 className="text-6xl font-bold tracking-tight">
+            Verify Any Claim Using Public Evidence
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+
+          <p className="text-xl text-gray-600 mt-6 max-w-3xl mx-auto">
+            Analyze news articles, social media posts, PDFs,
+            screenshots, government records and public datasets
+            with AI.
           </p>
+
+          <div className="mt-10 flex justify-center gap-4">
+            <button className="px-6 py-3 rounded-lg bg-black text-white">
+              Start Investigation
+            </button>
+
+            <button className="px-6 py-3 rounded-lg border">
+              View Demo
+            </button>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+      </section>
+
+      {/* Investigation Input */}
+      <section className="px-6">
+        <div className="max-w-4xl mx-auto border rounded-2xl p-6 shadow-sm">
+
+          <input
+            value={claim}
+            onChange={(e) => setClaim(e.target.value)}
+            className="w-full border rounded-lg p-4 mb-4"
+            placeholder="Paste a claim..."
+          />
+
+          <input
+            className="w-full border rounded-lg p-4 mb-6"
+            placeholder="Paste URL (Instagram, X, Facebook, News)"
+          />
+
+          <div className="grid md:grid-cols-3 gap-4">
+
+            <button className="border rounded-lg p-4 flex items-center justify-center gap-2">
+              <ImageIcon size={18} />
+              Upload Image
+            </button>
+
+            <button className="border rounded-lg p-4 flex items-center justify-center gap-2">
+              <FileText size={18} />
+              Upload PDF
+            </button>
+
+            <button className="border rounded-lg p-4 flex items-center justify-center gap-2">
+              <Link2 size={18} />
+              Screenshot
+            </button>
+
+          </div>
+
+          <button
+            onClick={handleInvestigation}
+            disabled={loading}
+            className="w-full mt-6 bg-black text-white p-4 rounded-lg flex items-center justify-center gap-2 disabled:opacity-50"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <Search size={18} />
+
+            {loading
+              ? "Investigating..."
+              : "Investigate"}
+          </button>
         </div>
-      </main>
-    </div>
+      </section>
+
+      {/* Features */}
+      <section className="py-24 px-6">
+        <div className="max-w-6xl mx-auto">
+
+          <h2 className="text-4xl font-bold text-center mb-12">
+            Powerful Investigation Features
+          </h2>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              "Claim Verification",
+              "Source Credibility",
+              "Knowledge Graph",
+              "Timeline Reconstruction",
+              "RTI Intelligence",
+              "Export Reports",
+            ].map((feature) => (
+              <div
+                key={feature}
+                className="border rounded-xl p-6 hover:shadow-lg transition"
+              >
+                <h3 className="font-semibold text-lg">
+                  {feature}
+                </h3>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </section>
+    </main>
   );
 }
