@@ -34,7 +34,17 @@ The app is designed around a simple investigation flow:
 
 ## Local development
 
+### Prerequisites
+
+Make sure these are installed on the target machine:
+
+- Node.js 20+ and npm
+- Python 3.10+
+- A running Neo4j instance if you want graph features to work
+
 ### 1. Install frontend dependencies
+
+From the project root:
 
 ```bash
 npm install
@@ -46,27 +56,48 @@ npm install
 npm run dev
 ```
 
-The app will be available at http://localhost:3000.
+The app should be available at http://localhost:3000.
 
-### 3. Start the backend
+### 3. Set up the backend environment
+
+From the project root:
 
 ```bash
 cd backend
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
+```
+
+If you are on macOS or Linux, use:
+
+```bash
+source .venv/bin/activate
+```
+
+### 4. Start the backend
+
+```bash
 uvicorn main:app --reload --port 8000
 ```
 
 The API will be available at http://localhost:8000.
 
+### 5. Initialize the database
+
+The backend expects a database URL to be set in the environment. If you are using SQLite for local development, create a .env file with a value such as:
+
+```env
+DATABASE_URL=sqlite:///./investigations.db
+```
+
+The application can then use the database file created at runtime.
+
 ## Environment variables
 
-Create environment files before running the backend services.
+Create a .env file in the backend folder before starting the backend services.
 
 ### Backend
-
-Create a .env file in the backend folder with values such as:
 
 ```env
 DATABASE_URL=sqlite:///./investigations.db
@@ -77,6 +108,12 @@ NEO4J_URI=bolt://localhost:7687
 NEO4J_USER=neo4j
 NEO4J_PASSWORD=your_password_here
 ```
+
+### Important notes
+
+- The backend imports several services at startup, so missing API keys can cause import-time failures.
+- If you only want to test the UI locally, the frontend can still run without the backend, but investigation features will not work properly until the backend and required services are configured.
+- For a full local run, Neo4j should be available and reachable at the URI configured above.
 
 ## Current status and pending work
 
